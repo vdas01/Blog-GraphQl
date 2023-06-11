@@ -1,0 +1,1 @@
+concurrently:- to run multiple scripts simuntaneously
