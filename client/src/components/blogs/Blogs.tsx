@@ -8,7 +8,6 @@ const Blogs = () => {
     return <p>Loading</p>
     if(error)
     return <p>Error</p>
-    console.log(data);
   return (
     <div>
        <BlogList blogs={data.blogs}/>

@@ -45,6 +45,9 @@ export const blogStyles:Styles = {
     height:"35%",
     padding:1,
     mb:2,
+    ":hover":{
+      cursor:"pointer"
+    }
    },
    dateContainer:{
          display:"flex",

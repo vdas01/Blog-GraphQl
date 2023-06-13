@@ -5,6 +5,9 @@ import { ImBlogger } from "react-icons/im"
 import {useForm} from "react-hook-form";
 import { useMutation } from "@apollo/client";
 import { USER_LOGIN, USER_SIGNUP } from "../graphql/mutations";
+import {useDispatch, useSelector} from "react-redux";
+import { authActions } from "../../store/auth-slice";
+import { useNavigate } from "react-router-dom";
 
 type Inputs = {
   name:string,
@@ -12,25 +15,56 @@ type Inputs = {
   password:string
 }
 const Auth = () => {
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector((state:any)=>state.isLoggedIn)
+  console.log(isLoggedIn);
   const theme = useTheme();
   const {register,formState: {errors}, handleSubmit} = useForm<Inputs>();
  
   //loginResposne--> {data,loading,error}
+  const dispatch = useDispatch();
   const [login,loginResponse] = useMutation(USER_LOGIN)
   const [signup,singupResponse] = useMutation(USER_SIGNUP);
   const [isSignUp, setIsSignUp] = useState(false);
   const isBelowMd = useMediaQuery(theme.breakpoints.down("md"));
+
+   const onResReceived = (data:any)=>{
+    if(data.signup){
+          const {id,email,name} = data.signup;
+          localStorage.setItem("userData",JSON.stringify({id,name,email}));
+    }
+    else{
+      const {id,email,name} = data.login;
+      localStorage.setItem("userData",JSON.stringify({id,name,email}));
+    }
+       dispatch(authActions.login());
+       navigate("/blogs");
+   }
+
    const onSubmit = async({name,email,password}:Inputs) => {
          if(isSignUp){
-                await signup({variables:{name,email,password}}).then(()=>{
-                  console.log(singupResponse);
-                })
+          try{
+              const res  =  await signup({variables:{name,email,password}})
+               if(res.data){
+                onResReceived(res.data);
+               }
+            }
+            catch(err:any){
+              console.log("Error in singup :- " + err.message);
+            }   
          }
          else{
-            await login({variables:{email,password}}).then(()=>{
-              console.log(loginResponse.data.login);
-            })
-         }
+          try{
+            const res = await login({variables:{email,password}})
+            if(res.data){
+              onResReceived(res.data);
+             }
+          }
+          catch(err:any){
+            console.log("Error in login " + err.message);
+          }
+
+        }
    }
 
   return <Box sx={authStyles.container}>

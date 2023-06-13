@@ -14,7 +14,7 @@ const BlogList = (props:Props) => {
     
   return <Box sx={blogStyles.container}>
        {props.blogs.length >0 &&  props.blogs.map((blog:BlogType)=>( 
-           <BlogItem blog={blog}/>
+           <BlogItem blog={blog} key={blog.id}/>
            ))
        }
   </Box>
